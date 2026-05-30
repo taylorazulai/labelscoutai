@@ -1,12 +1,13 @@
 /**
  * LabelScoutAI intake form → n8n Intake Webhook (Node 01)
  *
- * Set your webhook URL before going live:
- *   window.LABELSCOUT_WEBHOOK_URL = "https://your-n8n.example/webhook/...";
+ * Client-side fetch — URL is public in the browser, so hardcode production here.
+ * For local testing against the test webhook, set before script.js loads:
+ *   window.LABELSCOUT_WEBHOOK_URL = "https://n8n.example/webhook-test/...";
  */
 const WEBHOOK_URL =
   window.LABELSCOUT_WEBHOOK_URL ||
-  "http://n8n.powermindai.xyz/webhook-test/localscoutai-intake";
+  "https://n8n.powermindai.xyz/webhook/localscoutai-intake";
 
 const form = document.getElementById("intake-form");
 const statusEl = document.getElementById("form-status");
