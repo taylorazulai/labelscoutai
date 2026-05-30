@@ -1,10 +1,13 @@
 /**
- * LabelScoutAI intake form → /api/intake → n8n webhook (server-side proxy)
+ * LabelScoutAI intake form → n8n webhook (browser → n8n directly)
  *
- * The browser posts to same-origin /api/intake to avoid HTTPS→HTTP mixed content
- * and cross-origin CORS blocks. Configure the n8n URL via N8N_WEBHOOK_URL in Vercel.
+ * We post from the browser because Cloudflare on n8n blocks Vercel server IPs,
+ * so /api/intake cannot reach the webhook. Requires n8n CORS for this site:
+ *   N8N_CORS_ORIGIN=https://www.labelscoutai.com,https://labelscoutai.com
  */
-const WEBHOOK_URL = window.LABELSCOUT_WEBHOOK_URL || "/api/intake";
+const WEBHOOK_URL =
+  window.LABELSCOUT_WEBHOOK_URL ||
+  "https://n8n.powermindai.xyz/webhook-test/localscoutai-intake";
 
 const form = document.getElementById("intake-form");
 const statusEl = document.getElementById("form-status");
@@ -71,8 +74,13 @@ form.addEventListener("submit", async (e) => {
     form.reset();
   } catch (err) {
     console.error("Form submission error:", err);
+    const isCors =
+      err instanceof TypeError ||
+      String(err.message || err).toLowerCase().includes("failed to fetch");
     showStatus(
-      "Something went wrong submitting your audit. Please try again or contact support.",
+      isCors
+        ? "Could not reach the intake service (CORS). On n8n, set N8N_CORS_ORIGIN to include https://www.labelscoutai.com"
+        : "Something went wrong submitting your audit. Please try again or contact support.",
       "error"
     );
   } finally {
