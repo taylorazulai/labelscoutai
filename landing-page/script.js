@@ -7,7 +7,7 @@
  */
 const WEBHOOK_URL =
   window.LABELSCOUT_WEBHOOK_URL ||
-  "https://n8n.powermindai.xyz/webhook/localscoutai-intake";
+  "http://n8n.powermindai.xyz/webhook-test/localscoutai-intake";
 
 const form = document.getElementById("intake-form");
 const statusEl = document.getElementById("form-status");
