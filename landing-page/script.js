@@ -1,13 +1,10 @@
 /**
- * LabelScoutAI intake form → n8n Intake Webhook (Node 01)
+ * LabelScoutAI intake form → /api/intake → n8n webhook (server-side proxy)
  *
- * Client-side fetch — URL is public in the browser, so hardcode production here.
- * For local testing against the test webhook, set before script.js loads:
- *   window.LABELSCOUT_WEBHOOK_URL = "https://n8n.example/webhook-test/...";
+ * The browser posts to same-origin /api/intake to avoid HTTPS→HTTP mixed content
+ * and cross-origin CORS blocks. Configure the n8n URL via N8N_WEBHOOK_URL in Vercel.
  */
-const WEBHOOK_URL =
-  window.LABELSCOUT_WEBHOOK_URL ||
-  "http://n8n.powermindai.xyz/webhook-test/localscoutai-intake";
+const WEBHOOK_URL = window.LABELSCOUT_WEBHOOK_URL || "/api/intake";
 
 const form = document.getElementById("intake-form");
 const statusEl = document.getElementById("form-status");
