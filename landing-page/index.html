@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Record Label Demo Submissions 2026 | LabelScoutAI</title>
+  <meta name="description" content="Stop cold-email spamming. Get your unreleased music matching verified, active indie record labels in LA, London, & Berlin. Generate your Pitch Dossier in 60s." />
+  <meta name="keywords" content="Record label demo submissions 2026, How to submit music to a record label, Get signed to indie record labels, Direct A&R contacts music industry, Private SoundCloud link demo pitch" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="ambient" aria-hidden="true">
+    <div class="ambient__orb ambient__orb--1"></div>
+    <div class="ambient__orb ambient__orb--2"></div>
+    <div class="ambient__orb ambient__orb--3"></div>
+  </div>
+
+  <header class="header">
+    <div class="container header__inner">
+      <a href="#" class="logo">
+        <span class="logo__mark">◈</span>
+        LabelScout<span class="logo__ai">AI</span>
+      </a>
+      <nav class="nav">
+        <a href="#advantages">How It Works</a>
+        <a href="#hubs">Music Hubs</a>
+        <a href="#checklist">Checklist</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <a href="#audit" class="btn btn--sm btn--primary">Run Audit</a>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="container hero__grid">
+        <div class="hero__content">
+          <p class="eyebrow">A&R Scout & Pitch Prep Dossier</p>
+          <h1>Get Your Unreleased Music Matching Active Record Labels Worldwide.</h1>
+          <p class="hero__sub">
+            Stop sending blind cold emails that get ignored. LabelScoutAI's automated A&R engine analyzes your sonic profile and matches your track with the exact active independent record labels signing in <strong>Los Angeles, London, Berlin, Nashville, and New York</strong> right now. Get a tailored "Pitch Prep Dossier" in under 60 seconds.
+          </p>
+          <ul class="badges">
+            <li>
+              <span class="badges__icon">◆</span>
+              Mined directly from Spotify & Beatport metadata
+            </li>
+            <li>
+              <span class="badges__icon">◆</span>
+              Active checks on current 2026 demo submission policies
+            </li>
+            <li>
+              <span class="badges__icon">◆</span>
+              Custom email pitch drafting referencing actual recent releases
+            </li>
+          </ul>
+          <a href="#audit" class="btn btn--primary btn--lg">Generate My Pitch Dossier</a>
+        </div>
+        <div class="hero__visual">
+          <div class="waveform-card">
+            <div class="waveform-card__header">
+              <span class="pulse"></span>
+              Live roster scan
+            </div>
+            <div class="waveform">
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+              <span></span><span></span><span></span><span></span><span></span>
+            </div>
+            <div class="waveform-card__stats">
+              <div><strong>847</strong><span>Labels indexed</span></div>
+              <div><strong>12</strong><span>Hubs active</span></div>
+              <div><strong>&lt;60s</strong><span>Report time</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Form -->
+    <section id="audit" class="section section--form">
+      <div class="container">
+        <div class="form-panel">
+          <div class="form-panel__intro">
+            <h2>Run Your Pre-Flight Pitch Audit</h2>
+            <p>Provide your track details below. Our AI engine will conduct digital archaeology across Spotify roster datasets and current web policies, delivering your custom dossier directly to your inbox.</p>
+          </div>
+
+          <form id="intake-form" class="intake-form" novalidate>
+            <div class="form-row">
+              <div class="field">
+                <label for="artist_name">Artist Name</label>
+                <input type="text" id="artist_name" name="artist_name" placeholder="e.g., Siren Loop" required />
+                <span class="field__help">Your official artist project name for the report cover page.</span>
+              </div>
+              <div class="field">
+                <label for="contact_email">Contact Email</label>
+                <input type="email" id="contact_email" name="contact_email" placeholder="e.g., sirenloop@gmail.com" required />
+                <span class="field__help">Where should we send your completed Pitch Prep Dossier PDF?</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label for="genre">Genre</label>
+                <input type="text" id="genre" name="genre" list="genre-suggestions" placeholder="e.g., Melodic Techno, Indie Folk, UK Garage, Bedroom Pop" required />
+                <datalist id="genre-suggestions">
+                  <option value="Melodic Techno"></option>
+                  <option value="Indie Folk"></option>
+                  <option value="UK Garage"></option>
+                  <option value="Bedroom Pop"></option>
+                  <option value="Dark Techno"></option>
+                  <option value="Americana"></option>
+                  <option value="Post-Punk"></option>
+                </datalist>
+                <span class="field__help">Helps match your sonic lane to active record label niches.</span>
+              </div>
+              <div class="field">
+                <label for="soundcloud_link">SoundCloud Link</label>
+                <input type="url" id="soundcloud_link" name="soundcloud_link" placeholder="https://soundcloud.com/sirenloop/deep-ocean-demo/s-xxxx" required />
+                <span class="field__help field__help--warn">Always use a private, secret link (SoundCloud links must contain the secret token, e.g., /s-xxxx). Ensure download permissions are enabled so A&Rs can test your track.</span>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="field">
+                <label for="reference_artists">Reference Artists</label>
+                <input type="text" id="reference_artists" name="reference_artists" placeholder="e.g., Lane 8, Rufus Du Sol, Ben Böhmer" required />
+                <span class="field__help">Our engine uses Spotify API metadata to track down the exact independent labels behind these artists' releases.</span>
+              </div>
+              <div class="field">
+                <label for="instagram_handle">Instagram Handle</label>
+                <input type="text" id="instagram_handle" name="instagram_handle" placeholder="e.g., @sirenloopmusic" />
+                <span class="field__help">Modern A&R reps evaluate social footprint alongside the music. Our tool audits your social layout.</span>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="btn btn--primary btn--lg btn--glow">
+                <span class="btn__text">Generate My Pitch Dossier</span>
+                <span class="btn__icon">⚡</span>
+              </button>
+              <p class="form-actions__note">Takes under 60 seconds. No credit card required.</p>
+            </div>
+
+            <div id="form-status" class="form-status" role="status" aria-live="polite" hidden></div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- Advantages -->
+    <section id="advantages" class="section">
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">The Automated Advantage</p>
+          <h2>Why artists switch to LabelScoutAI</h2>
+        </div>
+        <div class="cards">
+          <article class="card">
+            <span class="card__num">01</span>
+            <h3>Ditch the Cold Email "Black Hole"</h3>
+            <p><strong>Stop BCC'ing 100 labels simultaneously.</strong> Most demos are rejected because artists submit to labels that don't release their genre, or use generic, unpersonalized copy. LabelScoutAI identifies the exact sub-genre imprints that sign sounds like yours, keeping your reputation pristine and your pitches highly targeted.</p>
+          </article>
+          <article class="card">
+            <span class="card__num">02</span>
+            <h3>Programmatic Roster Mining</h3>
+            <p><strong>We trace the exact P-lines.</strong> How do you submit music to a record label that is actually looking for your sound? Our algorithm scans the copyright (P-line) metadata of recent Spotify and Beatport releases by your reference artists. If a label is actively releasing and charting in your sonic lane, we find it, analyze its current signing activity, and add it to your matching list.</p>
+          </article>
+          <article class="card">
+            <span class="card__num">03</span>
+            <h3>Live "A&R Policy" Auditing</h3>
+            <p><strong>No outdated directories or dead email contacts.</strong> A&R personnel turn over rapidly, and labels change their submission guidelines overnight. Our AI-driven web-agent scraper performs a live verification of each target label's homepages, Linktrees, and socials. We tell you if they are open, if they prefer direct email, or if they require a portal like LabelRadar or SubmitHub.</p>
+          </article>
+          <article class="card">
+            <span class="card__num">04</span>
+            <h3>Human-Quality Pitch Copywriting</h3>
+            <p><strong>Get custom emails referencing their actual recent releases.</strong> Record labels delete generic template pitches. LabelScoutAI automatically writes highly personalized, polite, and scannable email pitches for each direct-email target on your matching list. The AI pulls the label A&R's name and naturally references a real, recent release from their catalog, demonstrating that you actually follow their roster.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- GEO Hubs -->
+    <section id="hubs" class="section section--hubs">
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">Global Music Hubs</p>
+          <h2>Connect with local indie ecosystems</h2>
+          <p class="section-header__lead">Your music isn't made in a vacuum. Connect with the exact local indie ecosystems driving trends in major music hubs.</p>
+        </div>
+        <div class="hubs">
+          <article class="hub">
+            <span class="hub__flag">🇺🇸</span>
+            <h3>Los Angeles (LA)</h3>
+            <p>Home to the world's leading indie-pop and commercial electronic imprints. We target high-signal, active boutique hubs in Silver Lake, Venice, and Echo Park.</p>
+          </article>
+          <article class="hub">
+            <span class="hub__flag">🇬🇧</span>
+            <h3>London & Bristol</h3>
+            <p>The heart of UK bass, house, garage, and post-punk. Our metadata matching engine has direct paths to active London tastemaker labels looking for unreleased UK-influenced productions.</p>
+          </article>
+          <article class="hub">
+            <span class="hub__flag">🇩🇪</span>
+            <h3>Berlin</h3>
+            <p>The global capital of dark techno, minimal house, and melodic ambient. We filter out inactive imprints to target Berlin's legendary boutique crews currently accepting demos via LabelRadar and SoundCloud.</p>
+          </article>
+          <article class="hub">
+            <span class="hub__flag">🇺🇸</span>
+            <h3>Nashville</h3>
+            <p>The global home of songwriting, indie-folk, and acoustic authenticity. We audit and match Nashville-based singer-songwriters with active boutique folk and Americana labels that actually value catalog depth over TikTok metrics.</p>
+          </article>
+          <article class="hub">
+            <span class="hub__flag">🇺🇸</span>
+            <h3>Austin</h3>
+            <p>The live music capital. We help local touring bands find matching boutique labels that focus on sync licensing opportunities and live booking networks.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- Checklist -->
+    <section id="checklist" class="section section--checklist">
+      <div class="container">
+        <div class="checklist-panel">
+          <div class="checklist-panel__intro">
+            <p class="eyebrow">Pre-Flight Checklist</p>
+            <h2>Pass the first-stage A&R filter</h2>
+            <p>Before you submit your music to a record label, run through the standard industry filters. LabelScoutAI automatically checks these parameters in your SoundCloud link, so you pass the first-stage A&R filter.</p>
+          </div>
+          <ol class="checklist">
+            <li>
+              <span class="checklist__marker">✓</span>
+              <div>
+                <h3>Mixed & Mastered Standards</h3>
+                <p>Is your track sonically competitive with current releases? Labels discard up to 60% of demos due to poor audio quality.</p>
+              </div>
+            </li>
+            <li>
+              <span class="checklist__marker">✓</span>
+              <div>
+                <h3>Private SoundCloud Etiquette</h3>
+                <p>Is your track set to "Private" with the secret token active? If an A&R sees a public link or a track with 200 previous plays, they assume other labels have already passed on it.</p>
+              </div>
+            </li>
+            <li>
+              <span class="checklist__marker">✓</span>
+              <div>
+                <h3>Download Permissions Enabled</h3>
+                <p>Did you enable downloads on your SoundCloud link? A&Rs need to download 320kbps MP3s to test your tracks on CDJs or studio monitors.</p>
+              </div>
+            </li>
+            <li>
+              <span class="checklist__marker">✓</span>
+              <div>
+                <h3>No Attachments, Ever</h3>
+                <p>Never attach audio files directly to email pitches. It clogs inboxes and gets flagged as spam.</p>
+              </div>
+            </li>
+          </ol>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section id="faq" class="section">
+      <div class="container">
+        <div class="section-header">
+          <p class="eyebrow">FAQ</p>
+          <h2>Common questions</h2>
+        </div>
+        <div class="faq">
+          <details class="faq__item">
+            <summary>Do you submit my music directly to major record labels?</summary>
+            <p>No, and you shouldn't either. Major labels (Sony, Universal, Warner) explicitly enforce strict, legally mandated "no unsolicited material" policies to avoid copyright lawsuits. They only accept submissions through music attorneys or established managers. LabelScoutAI helps you match and pitch to <strong>highly active, independent boutique labels</strong> where direct, high-quality submissions have a realistic signing rate.</p>
+          </details>
+          <details class="faq__item">
+            <summary>How does the AI matching algorithm work?</summary>
+            <p>When you submit your reference artists, our engine queries the Spotify API to pull their recent discography and inspects the copyright metadata (the "P-line") to find the exact labels behind those releases. We then run an automated web-scraper (using Perplexity) to search each label's web footprint to verify if they are active, check their current demo submission channels, and pull the name of their lead A&R person.</p>
+          </details>
+          <details class="faq__item">
+            <summary>What if a label's submission email or link is outdated?</summary>
+            <p>A&R turnover is high. That is why LabelScoutAI does not rely on a static, outdated database. Our system executes <strong>live, programmatic web searches</strong> using AI-agent nodes to find the most current guidelines posted on their website or social media Linktrees before generating your report.</p>
+          </details>
+          <details class="faq__item">
+            <summary>Is my unreleased music safe and secure?</summary>
+            <p>Absolutely. LabelScoutAI never downloads, stores, or publicly shares your audio files. We only analyze the text-based link and metadata you provide to evaluate the URL's formatting correctness, keeping your unreleased intellectual property completely private.</p>
+          </details>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer__inner">
+      <a href="#" class="logo logo--footer">
+        <span class="logo__mark">◈</span>
+        LabelScout<span class="logo__ai">AI</span>
+      </a>
+      <p class="footer__copy">Automated A&R Scout & Pitch Prep for independent artists.</p>
+      <a href="#audit" class="btn btn--sm btn--ghost">Get started</a>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
