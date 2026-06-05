@@ -4,6 +4,8 @@
  * Paste this into: AI Agent → Tools → Custom Code Tool
  * Node name on canvas: spotify_metadata_extractor
  *
+ * HTTP: use helpers.httpRequest (not bare httpRequest). $env is blocked in Code Tools.
+ *
  * Credentials (pick ONE method — $env is blocked in Code Tools on n8n v2+):
  *
  *   A) n8n Variables (recommended): Settings → Variables
@@ -76,7 +78,7 @@ if (!clientId || !clientSecret) {
 }
 
 async function spotifyGet(url, token) {
-  return await $helpers.httpRequest({
+  return await helpers.httpRequest({
     method: 'GET',
     url,
     headers: {
@@ -86,7 +88,7 @@ async function spotifyGet(url, token) {
   });
 }
 
-const tokenResponse = await $helpers.httpRequest({
+const tokenResponse = await helpers.httpRequest({
   method: 'POST',
   url: 'https://accounts.spotify.com/api/token',
   headers: {
