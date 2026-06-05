@@ -4,9 +4,13 @@
  * Paste this into: AI Agent → Tools → Custom Code Tool
  * Node name on canvas: spotify_metadata_extractor
  *
- * Required n8n env vars (Settings → Variables):
- *   SPOTIFY_CLIENT_ID
- *   SPOTIFY_CLIENT_SECRET
+ * Credentials (pick ONE method — $env is blocked in Code Tools on n8n v2+):
+ *
+ *   A) n8n Variables (recommended): Settings → Variables
+ *        SPOTIFY_CLIENT_ID
+ *        SPOTIFY_CLIENT_SECRET
+ *
+ *   B) Inline fallback: fill SPOTIFY_CONFIG below (stored in workflow JSON)
  *
  * Input schema (enable "Specify Input Schema"):
  * {
@@ -20,6 +24,12 @@
  *   "required": ["artist_name"]
  * }
  */
+
+// Inline fallback — only used when n8n Variables are not set
+const SPOTIFY_CONFIG = {
+  clientId: '',
+  clientSecret: '',
+};
 
 const MAX_ALBUMS = 10;
 const MARKET = 'US';
@@ -36,12 +46,31 @@ if (!artistName) {
   });
 }
 
-const clientId = $env.SPOTIFY_CLIENT_ID;
-const clientSecret = $env.SPOTIFY_CLIENT_SECRET;
+function resolveSpotifyCredentials() {
+  let clientId = '';
+  let clientSecret = '';
+
+  try {
+    clientId = String($vars.SPOTIFY_CLIENT_ID || '').trim();
+    clientSecret = String($vars.SPOTIFY_CLIENT_SECRET || '').trim();
+  } catch {
+    // $vars unavailable in this runner context
+  }
+
+  if (!clientId || !clientSecret) {
+    clientId = String(SPOTIFY_CONFIG.clientId || '').trim();
+    clientSecret = String(SPOTIFY_CONFIG.clientSecret || '').trim();
+  }
+
+  return { clientId, clientSecret };
+}
+
+const { clientId, clientSecret } = resolveSpotifyCredentials();
 
 if (!clientId || !clientSecret) {
   return JSON.stringify({
-    error: 'Missing SPOTIFY_CLIENT_ID or SPOTIFY_CLIENT_SECRET in n8n environment variables',
+    error:
+      'Missing Spotify credentials. Set n8n Variables SPOTIFY_CLIENT_ID and SPOTIFY_CLIENT_SECRET (Settings → Variables), or paste values into SPOTIFY_CONFIG in this tool code. Note: $env is blocked in Code Tools on n8n v2+.',
     albums: [],
   });
 }
