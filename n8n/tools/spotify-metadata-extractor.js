@@ -5,6 +5,7 @@
  * Node name on canvas: spotify_metadata_extractor
  *
  * HTTP: use helpers.httpRequest (not bare httpRequest). $env is blocked in Code Tools.
+ * URLSearchParams is not available in the Code Tool sandbox — use toQueryString() below.
  *
  * Credentials (pick ONE method — $env is blocked in Code Tools on n8n v2+):
  *
@@ -35,6 +36,12 @@ const SPOTIFY_CONFIG = {
 
 const MAX_ALBUMS = 10;
 const MARKET = 'US';
+
+function toQueryString(params) {
+  return Object.entries(params)
+    .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}`)
+    .join('&');
+}
 
 const artistName =
   typeof query === 'string'
@@ -112,11 +119,11 @@ if (!token) {
 
 const searchUrl =
   'https://api.spotify.com/v1/search?' +
-  new URLSearchParams({
+  toQueryString({
     q: artistName,
     type: 'artist',
     limit: '5',
-  }).toString();
+  });
 
 const search = await spotifyGet(searchUrl, token);
 const candidates = search.artists?.items || [];
@@ -137,11 +144,11 @@ const matched =
 
 const albumsUrl =
   `https://api.spotify.com/v1/artists/${matched.id}/albums?` +
-  new URLSearchParams({
+  toQueryString({
     include_groups: 'album,single',
     market: MARKET,
     limit: String(MAX_ALBUMS),
-  }).toString();
+  });
 
 const albumsList = await spotifyGet(albumsUrl, token);
 const simplified = albumsList.items || [];
@@ -163,7 +170,7 @@ for (let i = 0; i < albumIds.length; i += 20) {
   const batch = albumIds.slice(i, i + 20);
   const batchUrl =
     'https://api.spotify.com/v1/albums?' +
-    new URLSearchParams({ ids: batch.join(',') }).toString();
+    toQueryString({ ids: batch.join(',') });
   const batchResponse = await spotifyGet(batchUrl, token);
   fullAlbums.push(...(batchResponse.albums || []).filter(Boolean));
 }
