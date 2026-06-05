@@ -1,0 +1,324 @@
+{
+  "name": "Spotify Metadata Extractor",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Spotify Metadata Extractor (sub-workflow)\n\n**After import:** open each HTTP Request node and select your **Spotify OAuth2** credential.\n\n**Note:** Spotify removed batch `GET /v1/albums?ids=...` in Dev Mode (Feb 2026). This workflow fetches each album individually for P-line/copyright data.\n\n**Test:** Execute workflow with `{ \"artist_name\": \"Khruangbin\" }`\n\n**Connect to main workflow:** use **Call n8n Workflow Tool** and select this workflow. Pass `artist_name` from the agent.",
+        "height": 260,
+        "width": 460
+      },
+      "id": "a1b2c3d4-0001-4000-8000-000000000001",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -120,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "inputSource": "workflowInputs",
+        "workflowInputs": {
+          "values": [
+            {
+              "name": "artist_name",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "id": "a1b2c3d4-0002-4000-8000-000000000002",
+      "name": "When Executed by Another Workflow",
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://api.spotify.com/v1/search",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "specifyQuery": "keypair",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "q",
+              "value": "={{ $json.artist_name }}"
+            },
+            {
+              "name": "type",
+              "value": "artist"
+            },
+            {
+              "name": "limit",
+              "value": "5"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0003-4000-8000-000000000003",
+      "name": "Search Artist",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const artistName = String($('When Executed by Another Workflow').first().json.artist_name || '').trim();\nconst candidates = $input.first().json.artists?.items || [];\n\nif (!artistName) {\n  return [{\n    json: {\n      error: 'artist_name is required',\n      query_artist: '',\n      matched_artist: null,\n      albums_returned: 0,\n      albums: [],\n    },\n  }];\n}\n\nif (!candidates.length) {\n  return [{\n    json: {\n      error: 'No Spotify artist match found',\n      query_artist: artistName,\n      matched_artist: null,\n      albums_returned: 0,\n      albums: [],\n    },\n  }];\n}\n\nconst target = artistName.toLowerCase();\nconst matched = candidates.find((artist) => artist.name.toLowerCase() === target) || candidates[0];\n\nreturn [{\n  json: {\n    query_artist: artistName,\n    matched_artist_id: matched.id,\n    matched_artist: matched,\n  },\n}];"
+      },
+      "id": "a1b2c3d4-0004-4000-8000-000000000004",
+      "name": "Match Artist",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b1b2c3d4-0001-4000-8000-000000000001",
+              "leftValue": "={{ $json.error }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0005-4000-8000-000000000005",
+      "name": "Artist Found?",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        960,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.spotify.com/v1/artists/{{ $json.matched_artist_id }}/albums",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "specifyQuery": "keypair",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "include_groups",
+              "value": "album,single"
+            },
+            {
+              "name": "market",
+              "value": "US"
+            },
+            {
+              "name": "limit",
+              "value": "10"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0006-4000-8000-000000000006",
+      "name": "Get Artist Albums",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1200,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const base = $('Match Artist').first().json;\nconst items = $input.first().json.items || [];\nconst seen = new Set();\nconst outputs = [];\n\nfor (const album of items) {\n  if (!album?.id || seen.has(album.id)) continue;\n  seen.add(album.id);\n  outputs.push({\n    json: {\n      query_artist: base.query_artist,\n      matched_artist: base.matched_artist,\n      album_id: album.id,\n      simplified_album: album,\n    },\n  });\n  if (outputs.length >= 10) break;\n}\n\nreturn outputs;"
+      },
+      "id": "a1b2c3d4-0007-4000-8000-000000000007",
+      "name": "Prepare Album Items",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1440,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://api.spotify.com/v1/albums/{{ $json.album_id }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "specifyQuery": "keypair",
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "market",
+              "value": "US"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "a1b2c3d4-0008-4000-8000-000000000008",
+      "name": "Get Full Album",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        1680,
+        200
+      ],
+      "continueOnFail": true
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const prepared = $('Prepare Album Items').all().map((item) => item.json);\nconst first = prepared[0] || {};\nconst matched = first.matched_artist || {};\n\nfunction parseLabel(text) {\n  if (!text) return null;\n  return text\n    .replace(/^℗\\s*/i, '')\n    .replace(/^©\\s*/i, '')\n    .replace(/^\\d{4}\\s+/, '')\n    .trim();\n}\n\nfunction isFullAlbum(payload) {\n  return Boolean(payload?.id && payload?.album_type && !payload?.error);\n}\n\nconst albums = $input.all().map((item, index) => {\n  const prep = prepared[index] || first;\n  const simplified = prep.simplified_album || {};\n  const full = isFullAlbum(item.json) ? item.json : null;\n  const source = full || simplified;\n  const copyrights = full?.copyrights || [];\n  const pLine = copyrights.find((entry) => entry.type === 'P');\n  const cLine = copyrights.find((entry) => entry.type === 'C');\n\n  return {\n    album_id: source.id || prep.album_id,\n    album_name: source.name || simplified.name,\n    album_type: source.album_type || simplified.album_type,\n    release_date: source.release_date || simplified.release_date,\n    total_tracks: source.total_tracks ?? simplified.total_tracks,\n    spotify_url: source.external_urls?.spotify || simplified.external_urls?.spotify || null,\n    label_from_p_line: parseLabel(pLine?.text),\n    p_line: pLine?.text || null,\n    c_line: cLine?.text || null,\n    copyrights,\n  };\n});\n\nreturn [{\n  json: {\n    query_artist: first.query_artist,\n    matched_artist: {\n      id: matched.id,\n      name: matched.name,\n      genres: matched.genres || [],\n      popularity: matched.popularity,\n      spotify_url: matched.external_urls?.spotify || null,\n    },\n    albums_returned: albums.length,\n    albums,\n  },\n}];"
+      },
+      "id": "a1b2c3d4-0009-4000-8000-000000000009",
+      "name": "Format Output",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1920,
+        200
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const item = $input.first().json;\n\nreturn [{\n  json: {\n    query_artist: item.query_artist ?? null,\n    error: item.error || 'No Spotify artist match found',\n    matched_artist: item.matched_artist ?? null,\n    albums_returned: 0,\n    albums: [],\n  },\n}];"
+      },
+      "id": "a1b2c3d4-000a-4000-8000-00000000000a",
+      "name": "No Artist Match",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1200,
+        420
+      ]
+    }
+  ],
+  "connections": {
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Search Artist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Artist": {
+      "main": [
+        [
+          {
+            "node": "Match Artist",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Artist": {
+      "main": [
+        [
+          {
+            "node": "Artist Found?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Artist Found?": {
+      "main": [
+        [
+          {
+            "node": "Get Artist Albums",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "No Artist Match",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Artist Albums": {
+      "main": [
+        [
+          {
+            "node": "Prepare Album Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Album Items": {
+      "main": [
+        [
+          {
+            "node": "Get Full Album",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Full Album": {
+      "main": [
+        [
+          {
+            "node": "Format Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}
