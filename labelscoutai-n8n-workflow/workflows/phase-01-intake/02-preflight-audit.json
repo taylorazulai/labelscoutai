@@ -3,8 +3,8 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Unit 02 — Pre-Flight Audit\n\n**Import:** Second unit — wire **Respond 202 Accepted** (Unit 01) → **Pre-Flight Rules**.\n\n**Env vars (optional):**\n- `SOUNDCLOUD_CLIENT_ID` — enables download check via SoundCloud resolve API\n\n**IF branches:**\n- **true** → Phase 2 (Spotify sub-workflow loop)\n- **false** → Unit 03 error email branch",
-        "height": 240,
+        "content": "## Unit 02 — Pre-Flight Audit\n\n**Import:** Second unit — wire **Respond 202 Accepted** (Unit 01) → **Pre-Flight Rules**.\n\n**Checks (code only):** valid SoundCloud URL, private link warning (`/s-`), **3–5 reference artists** (inclusive).\n\n**Note:** SoundCloud download verification removed — requires SoundCloud Pro/API access.\n\n**IF branches:**\n- **true** → Phase 2 (Spotify sub-workflow loop)\n- **false** → Unit 03 error email branch",
+        "height": 260,
         "width": 460
       },
       "id": "b1000002-0001-4000-8000-000000000001",
@@ -19,7 +19,7 @@
     {
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const items = $input.all();\n\nreturn items.map((item) => {\n  const data = item.json;\n  const url = data.soundcloud_link || '';\n  const audit_flags = [];\n  const audit_messages = [];\n\n  if (!url.includes('soundcloud.com')) {\n    audit_flags.push('NOT_SOUNDCLOUD_LINK');\n    audit_messages.push('Your link must be a valid SoundCloud URL.');\n  } else if (!url.includes('/s-')) {\n    audit_flags.push('PUBLIC_LINK_WARNING');\n    audit_messages.push(\n      'Your SoundCloud link appears public. Private demo links (with /s-) are preferred for unreleased tracks.',\n    );\n  }\n\n  if (!data.reference_artists || data.reference_artists.length === 0) {\n    audit_flags.push('MISSING_REFERENCE_ARTISTS');\n    audit_messages.push('Please provide at least one reference artist.');\n  }\n\n  const blocking = ['NOT_SOUNDCLOUD_LINK', 'MISSING_REFERENCE_ARTISTS'];\n  const is_valid_for_research = !audit_flags.some((flag) => blocking.includes(flag));\n\n  return {\n    json: {\n      ...data,\n      audit_flags,\n      audit_messages,\n      is_valid_for_research,\n      soundcloud_downloadable: null,\n      soundcloud_track: null,\n      phase: 'phase-01-preflight',\n    },\n  };\n});"
+        "jsCode": "const items = $input.all();\n\nreturn items.map((item) => {\n  const data = item.json;\n  const url = data.soundcloud_link || '';\n  const audit_flags = [];\n  const audit_messages = [];\n\n  if (!url.includes('soundcloud.com')) {\n    audit_flags.push('NOT_SOUNDCLOUD_LINK');\n    audit_messages.push('Your link must be a valid SoundCloud URL.');\n  } else if (!url.includes('/s-')) {\n    audit_flags.push('PUBLIC_LINK_WARNING');\n    audit_messages.push(\n      'Your SoundCloud link appears public. Private demo links (with /s-) are preferred for unreleased tracks.',\n    );\n  }\n\n  const MIN_REFS = 3;\n  const MAX_REFS = 5;\n  const refCount = Array.isArray(data.reference_artists) ? data.reference_artists.length : 0;\n  if (refCount < MIN_REFS) {\n    audit_flags.push('MISSING_REFERENCE_ARTISTS');\n    audit_messages.push(\n      `Please provide at least ${MIN_REFS} reference artists (comma-separated).`,\n    );\n  } else if (refCount > MAX_REFS) {\n    audit_flags.push('TOO_MANY_REFERENCE_ARTISTS');\n    audit_messages.push(\n      `Please provide no more than ${MAX_REFS} reference artists.`,\n    );\n  }\n\n  const blocking = [\n    'NOT_SOUNDCLOUD_LINK',\n    'MISSING_REFERENCE_ARTISTS',\n    'TOO_MANY_REFERENCE_ARTISTS',\n  ];\n  const is_valid_for_research = !audit_flags.some((flag) => blocking.includes(flag));\n\n  return {\n    json: {\n      ...data,\n      audit_flags,\n      audit_messages,\n      is_valid_for_research,\n      phase: 'phase-01-preflight',\n    },\n  };\n});"
       },
       "id": "b1000002-0002-4000-8000-000000000002",
       "name": "Pre-Flight Rules",
@@ -27,42 +27,6 @@
       "typeVersion": 2,
       "position": [
         960,
-        300
-      ]
-    },
-    {
-      "parameters": {
-        "method": "GET",
-        "url": "=https://api-v2.soundcloud.com/resolve?url={{ encodeURIComponent($json.soundcloud_link) }}&client_id={{ $env.SOUNDCLOUD_CLIENT_ID || '' }}",
-        "options": {
-          "response": {
-            "response": {
-              "neverError": true
-            }
-          }
-        }
-      },
-      "id": "b1000002-0003-4000-8000-000000000003",
-      "name": "Resolve SoundCloud Track",
-      "type": "n8n-nodes-base.httpRequest",
-      "typeVersion": 4.2,
-      "position": [
-        1200,
-        300
-      ],
-      "continueOnFail": true
-    },
-    {
-      "parameters": {
-        "mode": "runOnceForAllItems",
-        "jsCode": "const base = $('Pre-Flight Rules').first().json;\nconst resolve = $input.first().json || {};\nconst audit_flags = [...(base.audit_flags || [])];\nconst audit_messages = [...(base.audit_messages || [])];\nconst clientId = ($env.SOUNDCLOUD_CLIENT_ID || '').trim();\n\nlet soundcloud_downloadable = null;\nlet soundcloud_track = null;\n\nif (!clientId) {\n  if (!audit_flags.includes('DOWNLOAD_CHECK_SKIPPED')) {\n    audit_flags.push('DOWNLOAD_CHECK_SKIPPED');\n    audit_messages.push(\n      'Download status could not be verified automatically. Enable downloads on your SoundCloud track so A&Rs can grab your demo.',\n    );\n  }\n} else if (resolve.error || resolve.statusCode >= 400 || resolve.code) {\n  if (!audit_flags.includes('DOWNLOAD_CHECK_FAILED')) {\n    audit_flags.push('DOWNLOAD_CHECK_FAILED');\n    audit_messages.push(\n      'We could not verify whether your track is downloadable. Please confirm downloads are enabled in SoundCloud track settings.',\n    );\n  }\n} else if (typeof resolve.downloadable === 'boolean') {\n  soundcloud_downloadable = resolve.downloadable;\n  soundcloud_track = {\n    id: resolve.id || null,\n    title: resolve.title || null,\n    permalink: resolve.permalink_url || null,\n  };\n\n  if (!resolve.downloadable) {\n    audit_flags.push('DOWNLOAD_NOT_ENABLED');\n    audit_messages.push(\n      'Your track does not appear to be downloadable. A&Rs often need a download button — enable it in SoundCloud track settings.',\n    );\n  }\n}\n\nconst blocking = ['NOT_SOUNDCLOUD_LINK', 'MISSING_REFERENCE_ARTISTS'];\nconst is_valid_for_research = !audit_flags.some((flag) => blocking.includes(flag));\n\nreturn [\n  {\n    json: {\n      ...base,\n      audit_flags,\n      audit_messages,\n      is_valid_for_research,\n      soundcloud_downloadable,\n      soundcloud_track,\n      phase: 'phase-01-preflight',\n    },\n  },\n];"
-      },
-      "id": "b1000002-0004-4000-8000-000000000004",
-      "name": "Merge Pre-Flight Results",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        1440,
         300
       ]
     },
@@ -96,35 +60,13 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.2,
       "position": [
-        1680,
+        1200,
         300
       ]
     }
   ],
   "connections": {
     "Pre-Flight Rules": {
-      "main": [
-        [
-          {
-            "node": "Resolve SoundCloud Track",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Resolve SoundCloud Track": {
-      "main": [
-        [
-          {
-            "node": "Merge Pre-Flight Results",
-            "type": "main",
-            "index": 0
-          }
-        ]
-      ]
-    },
-    "Merge Pre-Flight Results": {
       "main": [
         [
           {

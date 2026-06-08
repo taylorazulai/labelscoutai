@@ -106,6 +106,8 @@ The former `n8n-attempt-v1/README.md` was deleted (outdated). All setup notes li
 }
 ```
 
+**Constraints:** `reference_artists` array length must be **3–5** (inclusive).
+
 Normalize also accepts alternate field names from earlier specs: `email`, `private_soundcloud_link`.
 
 ---
@@ -148,13 +150,14 @@ n8n **Respond → Immediately** (legacy “On Received”) cannot return custom 
 | Flag | Severity | Blocks research? |
 |------|----------|------------------|
 | `NOT_SOUNDCLOUD_LINK` | Error | **Yes** |
-| `MISSING_REFERENCE_ARTISTS` | Error | **Yes** |
+| `MISSING_REFERENCE_ARTISTS` | Error | **Yes** — fewer than 3 |
+| `TOO_MANY_REFERENCE_ARTISTS` | Error | **Yes** — more than 5 |
 | `PUBLIC_LINK_WARNING` | Warning | No — URL lacks private token `/s-` |
 | `DOWNLOAD_NOT_ENABLED` | Warning | No — track not downloadable; user should enable for A&Rs |
 | `DOWNLOAD_CHECK_SKIPPED` | Warning | No — no `SOUNDCLOUD_CLIENT_ID` configured yet |
 | `DOWNLOAD_CHECK_FAILED` | Warning | No — resolve API failed; user should verify manually |
 
-`is_valid_for_research = true` unless `NOT_SOUNDCLOUD_LINK` or `MISSING_REFERENCE_ARTISTS`.
+`is_valid_for_research = true` unless `NOT_SOUNDCLOUD_LINK`, `MISSING_REFERENCE_ARTISTS`, or `TOO_MANY_REFERENCE_ARTISTS`.
 
 ### SoundCloud download check
 

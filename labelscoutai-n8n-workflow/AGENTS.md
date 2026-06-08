@@ -78,6 +78,8 @@ Phase 1 webhook must accept this payload (see `../landing-page/script.js`):
 }
 ```
 
+**Constraints:** `reference_artists` must contain **3–5** entries (validated on the landing page and in pre-flight audit).
+
 **Webhook endpoint (test):** `https://n8n.powermindai.xyz/webhook-test/localscoutai-intake`
 
 **Infra constraints:**

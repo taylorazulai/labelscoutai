@@ -11,6 +11,10 @@ const WEBHOOK_URL =
 
 const form = document.getElementById("intake-form");
 const statusEl = document.getElementById("form-status");
+const referenceArtistsInput = document.getElementById("reference_artists");
+
+const MIN_REFERENCE_ARTISTS = 3;
+const MAX_REFERENCE_ARTISTS = 5;
 
 function parseReferenceArtists(value) {
   return value
@@ -18,6 +22,29 @@ function parseReferenceArtists(value) {
     .map((artist) => artist.trim())
     .filter(Boolean);
 }
+
+function validateReferenceArtists() {
+  const artists = parseReferenceArtists(referenceArtistsInput.value);
+
+  if (artists.length < MIN_REFERENCE_ARTISTS) {
+    referenceArtistsInput.setCustomValidity(
+      `Please enter at least ${MIN_REFERENCE_ARTISTS} reference artists, separated by commas.`
+    );
+    return false;
+  }
+
+  if (artists.length > MAX_REFERENCE_ARTISTS) {
+    referenceArtistsInput.setCustomValidity(
+      `Please enter no more than ${MAX_REFERENCE_ARTISTS} reference artists.`
+    );
+    return false;
+  }
+
+  referenceArtistsInput.setCustomValidity("");
+  return true;
+}
+
+referenceArtistsInput.addEventListener("input", validateReferenceArtists);
 
 function showStatus(message, type) {
   statusEl.hidden = false;
@@ -34,7 +61,7 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
   hideStatus();
 
-  if (!form.checkValidity()) {
+  if (!validateReferenceArtists() || !form.checkValidity()) {
     form.reportValidity();
     return;
   }
