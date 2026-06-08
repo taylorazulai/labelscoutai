@@ -171,7 +171,7 @@ n8n **Respond → Immediately** (legacy “On Received”) cannot return custom 
 - **To:** submitter `contact_email`
 - **When:** `is_valid_for_research === false` only
 - **Credential:** Resend API key (HTTP Header Auth: `Authorization: Bearer re_...`)
-- **From address:** set via n8n env `RESEND_FROM_EMAIL` (e.g. `LabelScout <hello@labelscoutai.com>`)
+- **From address:** set `email_from` in the **Format Error Email** Code node (some n8n hosts block `$env` in expressions)
 
 ### Deliverable split (Phase 1)
 

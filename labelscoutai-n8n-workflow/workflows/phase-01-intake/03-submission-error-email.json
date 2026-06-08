@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "content": "## Unit 03 — Submission Error Email (Resend)\n\n**Import:** Third unit — wire **Valid For Research?** FALSE output → **Format Error Email**.\n\n**Before testing:**\n1. Create HTTP Header Auth credential: `Authorization: Bearer re_YOUR_KEY`\n2. Assign credential on **Send via Resend**\n3. Set n8n env `RESEND_FROM_EMAIL` (e.g. `LabelScout <hello@labelscoutai.com>`)\n\nUses verified Resend sender domain.",
+        "content": "## Unit 03 — Submission Error Email (Resend)\n\n**Import:** Third unit — wire **Valid For Research?** FALSE output → **Format Error Email**.\n\n**Before testing:**\n1. Create HTTP Header Auth credential: `Authorization: Bearer re_YOUR_KEY`\n2. Assign credential on **Send via Resend**\n3. Edit `email_from` in **Format Error Email** (verified Resend sender)\n\nNote: `$env` is blocked on this n8n instance — do not use env vars in expressions.",
         "height": 260,
         "width": 460
       },
@@ -19,7 +19,7 @@
     {
       "parameters": {
         "mode": "runOnceForAllItems",
-        "jsCode": "const data = $input.first().json;\n\nconst blockingMap = {\n  NOT_SOUNDCLOUD_LINK: 'Submit a valid SoundCloud track URL (must include soundcloud.com).',\n  MISSING_REFERENCE_ARTISTS:\n    'Add at least three reference artists (comma-separated) so we can match you to the right labels.',\n  TOO_MANY_REFERENCE_ARTISTS:\n    'Use no more than five reference artists — remove extras and resubmit.',\n};\n\nconst issues = (data.audit_flags || [])\n  .filter((flag) => blockingMap[flag])\n  .map((flag) => blockingMap[flag]);\n\nconst issueHtml = issues.length\n  ? `<ul>${issues.map((issue) => `<li>${issue}</li>`).join('')}</ul>`\n  : '<p>One or more required fields failed validation.</p>';\n\nconst html = [\n  `<p>Hi ${data.artist_name || 'there'},</p>`,\n  '<p>We could not start your LabelScout pitch audit yet. Please fix the following and resubmit:</p>',\n  issueHtml,\n  '<p>Once updated, submit again at <a href=\"https://www.labelscoutai.com\">labelscoutai.com</a>.</p>',\n  `<p style=\"color:#666;font-size:12px;\">Reference: ${data.report_id || 'N/A'}</p>`,\n  '<p>— LabelScout</p>',\n].join('\\n');\n\nreturn [\n  {\n    json: {\n      ...data,\n      email_to: data.contact_email,\n      email_subject: 'LabelScout: please fix your submission',\n      email_html: html,\n      phase: 'phase-01-error-email',\n    },\n  },\n];"
+        "jsCode": "const data = $input.first().json;\n\nconst blockingMap = {\n  NOT_SOUNDCLOUD_LINK: 'Submit a valid SoundCloud track URL (must include soundcloud.com).',\n  MISSING_REFERENCE_ARTISTS:\n    'Add at least three reference artists (comma-separated) so we can match you to the right labels.',\n  TOO_MANY_REFERENCE_ARTISTS:\n    'Use no more than five reference artists — remove extras and resubmit.',\n};\n\nconst issues = (data.audit_flags || [])\n  .filter((flag) => blockingMap[flag])\n  .map((flag) => blockingMap[flag]);\n\nconst issueHtml = issues.length\n  ? `<ul>${issues.map((issue) => `<li>${issue}</li>`).join('')}</ul>`\n  : '<p>One or more required fields failed validation.</p>';\n\nconst html = [\n  `<p>Hi ${data.artist_name || 'there'},</p>`,\n  '<p>We could not start your LabelScout pitch audit yet. Please fix the following and resubmit:</p>',\n  issueHtml,\n  '<p>Once updated, submit again at <a href=\"https://www.labelscoutai.com\">labelscoutai.com</a>.</p>',\n  `<p style=\"color:#666;font-size:12px;\">Reference: ${data.report_id || 'N/A'}</p>`,\n  '<p>— LabelScout</p>',\n].join('\\n');\n\nreturn [\n  {\n    json: {\n      ...data,\n      // Edit this to your verified Resend sender ($env is blocked on some n8n hosts).\n      email_from: 'LabelScout <onboarding@resend.dev>',\n      email_to: data.contact_email,\n      email_subject: 'LabelScout: please fix your submission',\n      email_html: html,\n      phase: 'phase-01-error-email',\n    },\n  },\n];"
       },
       "id": "b1000003-0002-4000-8000-000000000002",
       "name": "Format Error Email",
@@ -38,7 +38,7 @@
         "genericAuthType": "httpHeaderAuth",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ from: $env.RESEND_FROM_EMAIL || 'LabelScout <onboarding@resend.dev>', to: [$json.email_to], subject: $json.email_subject, html: $json.email_html }) }}",
+        "jsonBody": "={{ JSON.stringify({ from: $json.email_from, to: [$json.email_to], subject: $json.email_subject, html: $json.email_html }) }}",
         "options": {}
       },
       "id": "b1000003-0003-4000-8000-000000000003",
