@@ -152,12 +152,12 @@ n8n **Respond → Immediately** (legacy “On Received”) cannot return custom 
 | `NOT_SOUNDCLOUD_LINK` | Error | **Yes** |
 | `MISSING_REFERENCE_ARTISTS` | Error | **Yes** — fewer than 3 |
 | `TOO_MANY_REFERENCE_ARTISTS` | Error | **Yes** — more than 5 |
-| `PUBLIC_LINK_WARNING` | Warning | No — URL lacks private token `/s-` |
+| `PUBLIC_SOUNDCLOUD_LINK` | Error | **Yes** — URL lacks private token `/s-` |
 | `DOWNLOAD_NOT_ENABLED` | Warning | No — track not downloadable; user should enable for A&Rs |
 | `DOWNLOAD_CHECK_SKIPPED` | Warning | No — no `SOUNDCLOUD_CLIENT_ID` configured yet |
 | `DOWNLOAD_CHECK_FAILED` | Warning | No — resolve API failed; user should verify manually |
 
-`is_valid_for_research = true` unless `NOT_SOUNDCLOUD_LINK`, `MISSING_REFERENCE_ARTISTS`, or `TOO_MANY_REFERENCE_ARTISTS`.
+`is_valid_for_research = true` unless `NOT_SOUNDCLOUD_LINK`, `PUBLIC_SOUNDCLOUD_LINK`, `MISSING_REFERENCE_ARTISTS`, or `TOO_MANY_REFERENCE_ARTISTS`.
 
 ### SoundCloud download check
 
@@ -198,7 +198,7 @@ Import one JSON unit at a time into the same n8n workflow, then wire connections
   "submitted_at": "ISO-8601",
   "source": "labelscout-landing-page",
   "timestamp": "ISO-8601",
-  "audit_flags": ["PUBLIC_LINK_WARNING"],
+  "audit_flags": [],
   "audit_messages": ["human-readable strings"],
   "is_valid_for_research": true,
   "soundcloud_downloadable": true,
