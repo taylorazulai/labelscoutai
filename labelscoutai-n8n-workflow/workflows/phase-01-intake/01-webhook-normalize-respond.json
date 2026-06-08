@@ -1,0 +1,101 @@
+{
+  "name": "LabelScout Phase 01 — Unit 01 Webhook Normalize Respond",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Unit 01 — Webhook → Normalize → 202 Respond\n\n**Import:** First unit in the main LabelScout workflow.\n\n**After import:**\n1. Activate workflow (or use test webhook URL).\n2. Webhook path: `localscoutai-intake` (matches `landing-page/script.js`).\n3. Connect **Respond to Webhook** main output → **Pre-Flight Rules** (Unit 02).\n\n**Test URL (test mode):** `POST https://n8n.powermindai.xyz/webhook-test/localscoutai-intake`\n\n**Test body:** see `project-brief/PROJECT-SUMMARY.md`",
+        "height": 280,
+        "width": 480
+      },
+      "id": "b1000001-0001-4000-8000-000000000001",
+      "name": "Sticky Note — Unit 01",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        80
+      ]
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "localscoutai-intake",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "b1000001-0002-4000-8000-000000000002",
+      "name": "Intake Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        240,
+        300
+      ],
+      "webhookId": "localscoutai-intake"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForAllItems",
+        "jsCode": "const items = $input.all();\n\nreturn items.map((item) => {\n  const data = item.json.body || item.json || {};\n\n  const report_id =\n    'RPT-' + Math.random().toString(36).substring(2, 9).toUpperCase();\n\n  let refs = [];\n  const rawRefs = data.reference_artists;\n  if (Array.isArray(rawRefs)) {\n    refs = rawRefs\n      .map((entry) => (typeof entry === 'string' ? entry.trim() : String(entry || '').trim()))\n      .filter(Boolean);\n  } else if (typeof rawRefs === 'string') {\n    refs = rawRefs.split(',').map((entry) => entry.trim()).filter(Boolean);\n  }\n\n  const email = (data.contact_email || data.email || '').toString().trim();\n  const soundcloudLink = (\n    data.soundcloud_link ||\n    data.private_soundcloud_link ||\n    ''\n  )\n    .toString()\n    .trim();\n\n  const instagramRaw = (data.instagram_handle || data.instagram || '')\n    .toString()\n    .trim();\n\n  return {\n    json: {\n      report_id,\n      artist_name: data.artist_name ? data.artist_name.toString().trim() : '',\n      contact_email: email,\n      email,\n      genre: data.genre ? data.genre.toString().trim() : 'Electronic',\n      soundcloud_link: soundcloudLink,\n      reference_artists: refs,\n      instagram_handle: instagramRaw,\n      instagram: instagramRaw.replace(/^@+/, ''),\n      submitted_at: data.submitted_at || null,\n      source: data.source || 'labelscout-landing-page',\n      timestamp: new Date().toISOString(),\n      phase: 'phase-01-normalize',\n    },\n  };\n});"
+      },
+      "id": "b1000001-0003-4000-8000-000000000003",
+      "name": "Normalize Intake",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        480,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ status: 'processing', message: 'Your track is being audited and matched. Your Pitch Prep Dossier will arrive in your email in under 3 minutes.', report_id: $json.report_id }) }}",
+        "options": {
+          "responseCode": 202
+        }
+      },
+      "id": "b1000001-0004-4000-8000-000000000004",
+      "name": "Respond 202 Accepted",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        300
+      ]
+    }
+  ],
+  "connections": {
+    "Intake Webhook": {
+      "main": [
+        [
+          {
+            "node": "Normalize Intake",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Intake": {
+      "main": [
+        [
+          {
+            "node": "Respond 202 Accepted",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "meta": {
+    "templateCredsSetupCompleted": false
+  }
+}
